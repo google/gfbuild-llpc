@@ -105,7 +105,7 @@ curl -fsSL -o repo https://storage.googleapis.com/git-repo-downloads/repo
 chmod a+x repo
 mkdir vulkandriver
 cd vulkandriver
-../repo init -u "https://github.com/${TARGET_REPO_ORG}/AMDVLK.git" -b "${COMMIT_ID}"
+../repo init -u "https://github.com/${TARGET_REPO_ORG}/${TARGET_REPO_NAME}.git" -b "${COMMIT_ID}"
 ../repo sync
 cd drivers
 
