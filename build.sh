@@ -107,12 +107,13 @@ mkdir vulkandriver
 cd vulkandriver
 ../repo init -u "https://github.com/${TARGET_REPO_ORG}/AMDVLK.git" -b "${COMMIT_ID}"
 ../repo sync
+cd drivers
 
 pushd spvgen/external
 python fetch_external_sources.py
 popd
 
-cd drivers/xgl
+cd xgl
 ###### END EDIT ######
 
 ###### BEGIN BUILD ######
