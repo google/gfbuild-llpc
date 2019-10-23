@@ -170,7 +170,7 @@ popd
 sha1sum "${INSTALL_DIR}.zip" >"${INSTALL_DIR}.zip.sha1"
 
 # POM file.
-sed -e "s/@GROUP@/${GROUP_DOTS}/g" -e "s/@ARTIFACT@/${ARTIFACT}/g" -e "s/@VERSION@/${ARTIFACT_VERSION}/g" "../fake_pom.xml" >"${POM_FILE}"
+sed -e "s/@GROUP@/${GROUP_DOTS}/g" -e "s/@ARTIFACT@/${ARTIFACT}/g" -e "s/@VERSION@/${ARTIFACT_VERSION}/g" "${WORK}/fake_pom.xml" >"${POM_FILE}"
 
 sha1sum "${POM_FILE}" >"${POM_FILE}.sha1"
 
