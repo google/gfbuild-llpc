@@ -149,7 +149,7 @@ case "$(uname)" in
   ;;
 esac
 
-for f in "${INSTALL_DIR}/bin"* "${INSTALL_DIR}/lib/"*; do
+for f in "${INSTALL_DIR}/bin/"* "${INSTALL_DIR}/lib/"*; do
   echo "${BUILD_REPO_SHA}">"${f}.build-version"
   cp "${WORK}/COMMIT_ID" "${f}.version"
 done
