@@ -31,6 +31,7 @@ case "$(uname)" in
   NINJA_OS="linux"
   BUILD_PLATFORM="Linux_x64"
   PYTHON="python3"
+  sudo DEBIAN_FRONTEND=noninteractive apt-get -qy install patchelf
   ;;
 
 "Darwin")
@@ -130,6 +131,10 @@ mkdir -p "${INSTALL_DIR}/lib"
 
 cp llpc/amdllpc* "${INSTALL_DIR}/bin/"
 cp spvgen/spvgen.* "${INSTALL_DIR}/lib/"
+
+# Set the rpath of amdllpc so spvgen.so will always be found.
+# shellcheck disable=SC2016
+patchelf --set-rpath '$ORIGIN/../lib' "${INSTALL_DIR}/bin/amdllpc"
 
 # Add .pdb files on Windows.
 case "$(uname)" in
