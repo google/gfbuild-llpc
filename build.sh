@@ -102,26 +102,26 @@ popd
 CMAKE_GENERATOR="Ninja"
 CMAKE_BUILD_TYPE="${CONFIG}"
 
-curl -fsSL -o repo https://storage.googleapis.com/git-repo-downloads/repo
-chmod a+x repo
-mkdir vulkandriver
-cd vulkandriver
-../repo init -u "https://github.com/${TARGET_REPO_ORG}/${TARGET_REPO_NAME}.git" -b "${COMMIT_ID}"
-../repo sync
-cd drivers
-
-pushd spvgen/external
-python fetch_external_sources.py
-popd
-
-cd xgl
-###### END EDIT ######
-
-###### BEGIN BUILD ######
-cmake -G "${CMAKE_GENERATOR}" -H. -Bbuilds/Release64 "-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}" "${CMAKE_OPTIONS[@]}"
-cd builds/Release64
-cmake --build . --config "${CMAKE_BUILD_TYPE}" --target amdllpc
-cmake --build . --config "${CMAKE_BUILD_TYPE}" --target spvgen
+#curl -fsSL -o repo https://storage.googleapis.com/git-repo-downloads/repo
+#chmod a+x repo
+#mkdir vulkandriver
+#cd vulkandriver
+#../repo init -u "https://github.com/${TARGET_REPO_ORG}/${TARGET_REPO_NAME}.git" -b "${COMMIT_ID}"
+#../repo sync
+#cd drivers
+#
+#pushd spvgen/external
+#python fetch_external_sources.py
+#popd
+#
+#cd xgl
+####### END EDIT ######
+#
+####### BEGIN BUILD ######
+#cmake -G "${CMAKE_GENERATOR}" -H. -Bbuilds/Release64 "-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}" "${CMAKE_OPTIONS[@]}"
+#cd builds/Release64
+#cmake --build . --config "${CMAKE_BUILD_TYPE}" --target amdllpc
+#cmake --build . --config "${CMAKE_BUILD_TYPE}" --target spvgen
 ###### END BUILD ######
 
 ###### START EDIT ######
@@ -129,8 +129,13 @@ cmake --build . --config "${CMAKE_BUILD_TYPE}" --target spvgen
 mkdir -p "${INSTALL_DIR}/bin"
 mkdir -p "${INSTALL_DIR}/lib"
 
-cp llpc/amdllpc* "${INSTALL_DIR}/bin/"
-cp spvgen/spvgen.* "${INSTALL_DIR}/lib/"
+#cp llpc/amdllpc* "${INSTALL_DIR}/bin/"
+#cp spvgen/spvgen.* "${INSTALL_DIR}/lib/"
+
+curl -fsSL -o llpc.zip "https://github.com/google/gfbuild-llpc/releases/download/github%2Fgoogle%2Fgfbuild-llpc%2F06e4d24336a16ed10d305931804d75a4104dce35/gfbuild-llpc-06e4d24336a16ed10d305931804d75a4104dce35-Linux_x64_Release.zip"
+unzip -d out llpc.zip
+cp out/bin/amdllpc "${INSTALL_DIR}/bin/"
+cp out/lib/spvgen.so "${INSTALL_DIR}/lib/"
 
 # Set the rpath of amdllpc so spvgen.so will always be found.
 # shellcheck disable=SC2016
