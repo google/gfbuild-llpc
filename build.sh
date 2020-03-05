@@ -106,7 +106,7 @@ cd vulkandriver
 cd drivers
 
 pushd spvgen/external
-python fetch_external_sources.py
+/usr/bin/python fetch_external_sources.py
 popd
 
 cd xgl
