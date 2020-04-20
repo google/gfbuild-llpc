@@ -33,6 +33,12 @@ case "$(uname)" in
   BUILD_PLATFORM="Linux_x64"
   PYTHON="python3"
   sudo DEBIAN_FRONTEND=noninteractive apt-get -qy install patchelf
+  df -h
+  sudo swapoff -a
+  sudo rm -f /swapfile
+  sudo apt clean
+  docker rmi $(docker image ls -aq)
+  df -h
   ;;
 
 "Darwin")
