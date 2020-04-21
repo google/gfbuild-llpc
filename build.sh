@@ -33,6 +33,12 @@ case "$(uname)" in
   BUILD_PLATFORM="Linux_x64"
   PYTHON="python3"
   sudo DEBIAN_FRONTEND=noninteractive apt-get -qy install patchelf
+  df -h
+  sudo swapoff -a
+  sudo rm -f /swapfile
+  sudo apt clean
+  docker rmi $(docker image ls -aq)
+  df -h
   ;;
 
 "Darwin")
@@ -110,26 +116,26 @@ pushd spvgen/external
 popd
 
 cd xgl
+
+# Get the release description using git now because we will delete the git repos to conserve space.
+DESCRIPTION="$(echo -e "Automated build for ${TARGET_REPO_NAME} version ${COMMIT_ID}.\n$(git log --graph -n 3 --abbrev-commit --pretty='format:%h - %s <%an>')")"
+# Delete git data to conserve space.
+rm -rf ../../.repo
+
 ###### END EDIT ######
 
 ###### BEGIN BUILD ######
-cmake -G "${CMAKE_GENERATOR}" -H. -Bbuilds/Release64 "-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}" "${CMAKE_OPTIONS[@]}"
-cd builds/Release64
-cmake --build . --config "${CMAKE_BUILD_TYPE}" --target amdllpc
-cmake --build . --config "${CMAKE_BUILD_TYPE}" --target spvgen
+
 ###### END BUILD ######
 
 ###### START EDIT ######
 
-mkdir -p "${INSTALL_DIR}/bin"
+cmake -G "${CMAKE_GENERATOR}" -H. -Bbuilds/Release64 "-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}" "${CMAKE_OPTIONS[@]}"
+cd builds/Release64
+
+cmake --build . --config "${CMAKE_BUILD_TYPE}" --target spvgen
 mkdir -p "${INSTALL_DIR}/lib"
-
-cp llpc/amdllpc* "${INSTALL_DIR}/bin/"
 cp spvgen/spvgen.* "${INSTALL_DIR}/lib/"
-
-# Set the rpath of amdllpc so spvgen.so will always be found.
-# shellcheck disable=SC2016
-patchelf --set-rpath '$ORIGIN/../lib' "${INSTALL_DIR}/bin/amdllpc"
 
 # Add .pdb files on Windows.
 case "$(uname)" in
@@ -140,7 +146,7 @@ case "$(uname)" in
   ;;
 
 "MINGW"*|"MSYS_NT"*)
-  "${PYTHON}" "${WORK}/add_pdbs.py" . "${INSTALL_DIR}"
+  "${PYTHON}" "${WORK}/add_pdbs.py" . "${INSTALL_DIR}/lib"
   ;;
 
 *)
@@ -148,6 +154,40 @@ case "$(uname)" in
   exit 1
   ;;
 esac
+
+# Conserve space and now build amdllpc.
+rm -rf spvgen/
+
+cmake --build . --config "${CMAKE_BUILD_TYPE}" --target amdllpc
+
+mkdir -p "${INSTALL_DIR}/bin"
+
+cp llpc/amdllpc* "${INSTALL_DIR}/bin/"
+
+# Add .pdb files on Windows.
+case "$(uname)" in
+"Linux")
+  ;;
+
+"Darwin")
+  ;;
+
+"MINGW"*|"MSYS_NT"*)
+  "${PYTHON}" "${WORK}/add_pdbs.py" . "${INSTALL_DIR}/bin"
+  ;;
+
+*)
+  echo "Unknown OS"
+  exit 1
+  ;;
+esac
+
+# Conserve space.
+rm -rf llvm/
+
+# Set the rpath of amdllpc so spvgen.so will always be found.
+# shellcheck disable=SC2016
+patchelf --set-rpath '$ORIGIN/../lib' "${INSTALL_DIR}/bin/amdllpc"
 
 for f in "${INSTALL_DIR}/bin/"* "${INSTALL_DIR}/lib/"*; do
   echo "${BUILD_REPO_SHA}">"${f}.build-version"
@@ -173,8 +213,6 @@ sha1sum "${INSTALL_DIR}.zip" >"${INSTALL_DIR}.zip.sha1"
 sed -e "s/@GROUP@/${GROUP_DOTS}/g" -e "s/@ARTIFACT@/${ARTIFACT}/g" -e "s/@VERSION@/${ARTIFACT_VERSION}/g" "${WORK}/fake_pom.xml" >"${POM_FILE}"
 
 sha1sum "${POM_FILE}" >"${POM_FILE}.sha1"
-
-DESCRIPTION="$(echo -e "Automated build for ${TARGET_REPO_NAME} version ${COMMIT_ID}.\n$(git log --graph -n 3 --abbrev-commit --pretty='format:%h - %s <%an>')")"
 
 # Only release from master branch commits.
 # shellcheck disable=SC2153
