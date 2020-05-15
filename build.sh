@@ -102,6 +102,7 @@ popd
 ###### START EDIT ######
 CMAKE_GENERATOR="Ninja"
 CMAKE_BUILD_TYPE="${CONFIG}"
+CMAKE_OPTIONS+=("-DBUILD_WAYLAND_SUPPORT=0")
 
 curl -fsSL -o repo https://storage.googleapis.com/git-repo-downloads/repo
 chmod a+x repo
