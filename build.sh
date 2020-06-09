@@ -37,7 +37,7 @@ case "$(uname)" in
   sudo swapoff -a
   sudo rm -f /swapfile
   sudo apt clean
-  docker rmi $(docker image ls -aq)
+  docker rmi "$(docker image ls -aq)"
   df -h
   ;;
 
@@ -163,7 +163,7 @@ cmake --build . --config "${CMAKE_BUILD_TYPE}" --target amdllpc
 
 mkdir -p "${INSTALL_DIR}/bin"
 
-cp llpc/amdllpc* "${INSTALL_DIR}/bin/"
+cp compiler/llpc/amdllpc* "${INSTALL_DIR}/bin/"
 
 # Add .pdb files on Windows.
 case "$(uname)" in
