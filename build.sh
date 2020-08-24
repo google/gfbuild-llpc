@@ -33,13 +33,14 @@ case "$(uname)" in
   BUILD_PLATFORM="Linux_x64"
   PYTHON="python3"
   sudo DEBIAN_FRONTEND=noninteractive apt-get -qy install patchelf
+
   df -h
-  sudo swapoff -a
-  sudo rm -f /swapfile
   sudo apt clean
   # shellcheck disable=SC2046
   docker rmi -f $(docker image ls -aq)
+  sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/hostedtoolcache/boost /opt/ghc
   df -h
+
   ;;
 
 "Darwin")
