@@ -32,7 +32,13 @@ case "$(uname)" in
   NINJA_OS="linux"
   BUILD_PLATFORM="Linux_x64"
   PYTHON="python3"
-  sudo DEBIAN_FRONTEND=noninteractive apt-get -qy install patchelf
+  sudo DEBIAN_FRONTEND=noninteractive apt-get -qy install patchelf \
+   libssl-dev \
+   libxcb-dri3-dev \
+   libxcb-dri2-0-dev \
+   libxcb-present-dev \
+   libxshmfence-dev \
+   libxrandr-dev
 
   df -h
   sudo apt clean
